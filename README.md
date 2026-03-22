@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# GhostLink Tracker
 
-## Getting Started
+GhostLink Tracker is a link tracking application designed to capture visitor IP addresses, perform geolocation analysis, and display the resulting telemetry on a web dashboard.
 
-First, run the development server:
+This repository features a decoupled architecture designed to bypass the ephemeral filesystem limitations of serverless platforms (such as Vercel) by separating the stateful backend API from the frontend UI.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## System Architecture
+
+The project is split into two autonomous components:
+
+1. **Frontend (Next.js & React)**
+   - Contains the user interface and dashboard metrics.
+   - Responsible for generating links and visualizing IP telemetry.
+   - **Recommended Hosting Provider:** [Vercel](https://vercel.com)
+
+2. **Backend (Express.js & SQLite)**
+   - Located in the `/backend` directory.
+   - Responsible for securely capturing headers (`x-forwarded-for`), fetching geolocation data from `ip-api.com`, and persisting records to a local SQLite database (`data.sqlite`).
+   - **Recommended Hosting Provider:** [Railway.app](https://railway.app) (Requires persistent volumes to retain the SQLite database).
+
+### Architecture Flow
+
+```mermaid
+sequenceDiagram
+    participant User A (Dashboard)
+    participant Vercel (Next.js)
+    participant Railway (Express)
+    participant SQLite (DB)
+    participant User B (Target)
+    participant IP_API
+    
+    User A (Dashboard)->>Vercel (Next.js): Enters Destination URL
+    Vercel (Next.js)->>Railway (Express): POST /api/links
+    Railway (Express)->>SQLite (DB): Insert new Tracker ID
+    Railway (Express)-->>Vercel (Next.js): Returns Tracking URL
+    
+    User B (Target)->>Railway (Express): Clicks Link (/t/[id])
+    Railway (Express)->>Railway (Express): Extracts IP (x-forwarded-for)
+    Railway (Express)->>IP_API: Fetch Geolocation for IP
+    IP_API-->>Railway (Express): Returns Country, City, ISP
+    Railway (Express)->>SQLite (DB): Save Click Telemetry
+    Railway (Express)-->>User B (Target): 307 Redirect to Destination URL
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Local Setup
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+To run this application locally for development or testing:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/DecentralizedJM/ghostlink-tracker.git
+   cd ghostlink-tracker
+   ```
 
-## Learn More
+2. **Start the Backend API (Port 3001):**
+   ```bash
+   cd backend
+   npm install
+   npm start
+   ```
 
-To learn more about Next.js, take a look at the following resources:
+3. **Start the Frontend UI (Port 3000):**
+   *(In a new terminal window)*
+   ```bash
+   npm install
+   npm run dev
+   ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+4. **Access the App:** 
+   Open `http://localhost:3000` in your browser.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+> **Note on Local Testing:** If the tracking link is opened from the local machine hosting the server, the captured IP will be `::1` or `127.0.0.1`. The system logs this as "Localhost / Local Network". To capture external geographic data locally, use a tunneling service such as `localtunnel` or `ngrok`.
 
-## Deploy on Vercel
+## Remote Deployment Strategy
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 1. Deploying the Backend (Railway)
+1. In the Railway dashboard, create a new service from this GitHub repository.
+2. In **Settings -> General**, update the **Root Directory** to `/backend`.
+3. In **Settings -> Volumes**, add a new persistent volume and mount it to `/app`. This ensures the `data.sqlite` file is retained between deployments.
+4. Go to **Networking** and generate a public domain (e.g., `track-api.up.railway.app`).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 2. Deploying the Frontend (Vercel)
+1. In the Vercel dashboard, import this repository.
+2. Ensure the framework preset is set to **Next.js**.
+3. In **Environment Variables**, add:
+   - **Name**: `NEXT_PUBLIC_API_URL`
+   - **Value**: `https://track-api.up.railway.app` *(The generated Railway domain from the previous step)*
+4. Click Deploy. 
+
+Once both services are deployed, the frontend application will route all telemetry data to the remote backend service for processing and storage.
