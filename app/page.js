@@ -20,26 +20,10 @@ export default function Home() {
       });
       const data = await res.json();
       
-      const rawTrackingUrl = `${apiUrl}/t/${data.id}`;
-      let finalTrackingUrl = rawTrackingUrl;
-      
-      try {
-        const shortRes = await fetch(`${apiUrl}/api/shorten`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: rawTrackingUrl })
-        });
-        if (shortRes.ok) {
-          const shortData = await shortRes.json();
-          finalTrackingUrl = shortData.shortUrl || rawTrackingUrl;
-        }
-      } catch (err) {
-        console.error('Shortener fallback', err);
-      }
-
       setLinkData({
         id: data.id,
-        trackingUrl: finalTrackingUrl,
+        trackingUrlArticle: `${window.location.origin}/article/${data.id}`,
+        trackingUrlFile: `${window.location.origin}/file/${data.id}`,
         statsUrl: `/stats/${data.id}`
       });
     } catch (err) {
@@ -75,12 +59,16 @@ export default function Home() {
       {linkData && (
         <div className="copy-area">
           <div>
-            <h3>Your Tracking Link</h3>
-            <a href={linkData.trackingUrl} target="_blank" rel="noopener noreferrer">{linkData.trackingUrl}</a>
+            <h3>Stealth Link (Article Format)</h3>
+            <a href={linkData.trackingUrlArticle} target="_blank" rel="noopener noreferrer">{linkData.trackingUrlArticle}</a>
           </div>
           <div>
-            <h3>View Statistics</h3>
-            <Link href={linkData.statsUrl} style={{ color: '#ec4899', textDecoration: 'none' }}>
+            <h3>Stealth Link (File Format)</h3>
+            <a href={linkData.trackingUrlFile} target="_blank" rel="noopener noreferrer">{linkData.trackingUrlFile}</a>
+          </div>
+          <div style={{ marginTop: '8px' }}>
+            <h3>View Statistics Dashboard</h3>
+            <Link href={linkData.statsUrl} style={{ color: '#ec4899', textDecoration: 'none', fontWeight: 'bold' }}>
               View Captured Data →
             </Link>
           </div>
