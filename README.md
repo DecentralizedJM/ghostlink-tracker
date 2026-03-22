@@ -91,3 +91,47 @@ To run this application locally for development or testing:
 4. Click Deploy. 
 
 Once both services are deployed, the frontend application will route all telemetry data to the remote backend service for processing and storage.
+
+## Contributing
+
+Contributions, issues, and feature requests are welcome! 
+
+1. Fork the Project
+2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the Branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
+
+## Disclaimer & Warning
+
+> **⚠️ Educational Purposes Only**
+> 
+> This software is provided strictly for educational, administrative, and defensive security research purposes. The developers and contributors are not responsible for any misuse, illegal tracking, or unauthorized surveillance activities conducted with this tool. Ensure you comply with all local, state, and federal privacy laws before deploying or using this tool to track individuals. Do not use this tool on targets without their explicit consent.
+
+## License
+
+Distributed under the MIT License. 
+
+```text
+MIT License
+
+Copyright (c) 2026 GhostLink Tracker Contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
