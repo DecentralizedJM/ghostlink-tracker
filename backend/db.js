@@ -6,7 +6,7 @@ let db = null;
 export async function openDb() {
   if (db) return db;
   
-  const dbPath = path.resolve(process.cwd(), 'data.sqlite');
+  const dbPath = process.env.DATABASE_PATH || path.resolve(process.cwd(), 'data.sqlite');
   
   return new Promise((resolve, reject) => {
     const database = new sqlite3.Database(dbPath, (err) => {

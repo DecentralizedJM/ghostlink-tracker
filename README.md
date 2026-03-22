@@ -76,8 +76,11 @@ To run this application locally for development or testing:
 ### 1. Deploying the Backend (Railway)
 1. In the Railway dashboard, create a new service from this GitHub repository.
 2. In **Settings -> General**, update the **Root Directory** to `/backend`.
-3. In **Settings -> Volumes**, add a new persistent volume and mount it to `/app`. This ensures the `data.sqlite` file is retained between deployments.
-4. Go to **Networking** and generate a public domain (e.g., `track-api.up.railway.app`).
+3. In **Settings -> Volumes**, add a new persistent volume and mount it to `/data` *(Do NOT mount it to `/app` as it will overwrite your code!)*.
+4. In **Variables**, add a new variable:
+   - **Name**: `DATABASE_PATH`
+   - **Value**: `/data/data.sqlite`
+5. Go to **Networking** and generate a public domain (e.g., `track-api.up.railway.app`).
 
 ### 2. Deploying the Frontend (Vercel)
 1. In the Vercel dashboard, import this repository.
