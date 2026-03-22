@@ -19,9 +19,27 @@ export default function Home() {
         body: JSON.stringify({ targetUrl })
       });
       const data = await res.json();
+      
+      const rawTrackingUrl = `${apiUrl}/t/${data.id}`;
+      let finalTrackingUrl = rawTrackingUrl;
+      
+      try {
+        const shortRes = await fetch(`${apiUrl}/api/shorten`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: rawTrackingUrl })
+        });
+        if (shortRes.ok) {
+          const shortData = await shortRes.json();
+          finalTrackingUrl = shortData.shortUrl || rawTrackingUrl;
+        }
+      } catch (err) {
+        console.error('Shortener fallback', err);
+      }
+
       setLinkData({
         id: data.id,
-        trackingUrl: `${apiUrl}/t/${data.id}`,
+        trackingUrl: finalTrackingUrl,
         statsUrl: `/stats/${data.id}`
       });
     } catch (err) {

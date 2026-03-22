@@ -24,6 +24,32 @@ app.post('/api/links', async (req, res) => {
   }
 });
 
+// URL Shortener Proxy (bypasses CORS restrictions)
+app.post('/api/shorten', async (req, res) => {
+  try {
+    const { url } = req.body;
+    
+    // Attempt TinyURL
+    const tinyResponse = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
+    if (tinyResponse.ok) {
+      const shortUrl = await tinyResponse.text();
+      return res.json({ shortUrl });
+    }
+    
+    // Fallback to is.gd
+    const isgdResponse = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`);
+    if (isgdResponse.ok) {
+      const shortUrl = await isgdResponse.text();
+      return res.json({ shortUrl });
+    }
+    
+    res.status(400).json({ error: 'Failed to shorten' });
+  } catch (err) {
+    console.error('Shorten error:', err);
+    res.status(500).json({ error: 'Server error parsing shortener' });
+  }
+});
+
 // 2. Click Handling and Geo-location
 app.get('/t/:id', async (req, res) => {
   const { id } = req.params;
